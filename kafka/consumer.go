@@ -919,5 +919,12 @@ func (c *Consumer) handleRebalanceEvent(channel chan Event, rkev *C.rd_kafka_eve
 		c.events <- newError(cErr)
 	}
 
-	return nil
+	// https://github.com/confluentinc/confluent-kafka-go/issues/610
+	// v1.5.2 was used to return RevokePartition/AssignPartition events from
+	// consumer's Poll method if `go.application.rebalance.enable` is set.
+	// Fix this regression for only the settings we use:
+	// 	 go.application.rebalance.enable=true and rebalanceCb=nil
+	//
+	// This fix is not applicable for other rebalance combinations.
+	return ev
 }
