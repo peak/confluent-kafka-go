@@ -30,6 +30,9 @@ for the balanced consumer groups of Apache Kafka 0.9 and above.
 
 See the [API documentation](http://docs.confluent.io/current/clients/confluent-kafka-go/index.html) for more information.
 
+For a step-by-step guide on using the client see [Getting Started with Apache Kafka and Golang](https://developer.confluent.io/get-started/go/).
+
+
 
 Examples
 ========
@@ -123,7 +126,7 @@ for use with [Confluent Cloud](https://www.confluent.io/confluent-cloud/).
 Getting Started
 ===============
 
-Supports Go 1.11+ and librdkafka 1.6.0+.
+Supports Go 1.11+ and librdkafka 1.9.0+.
 
 Using Go Modules
 ----------------
@@ -155,17 +158,14 @@ your `go.mod` file.
 Install the client
 ------------------
 
-If Go modules can't be used we recommend that you version pin the
-confluent-kafka-go import to `v1` using gopkg.in:
-
 Manual install:
 ```bash
-go get -u gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
+go get -u github.com/confluentinc/confluent-kafka-go/kafka
 ```
 
 Golang import:
 ```golang
-import "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+import "github.com/confluentinc/confluent-kafka-go/kafka"
 ```
 
 librdkafka
@@ -218,71 +218,23 @@ with `-tags dynamic`.
 **Note:** If you use the `master` branch of the Go client, then you need to use
           the `master` branch of librdkafka.
 
-**confluent-kafka-go requires librdkafka v1.6.0 or later.**
+**confluent-kafka-go requires librdkafka v1.9.0 or later.**
 
 
 API Strands
 ===========
 
-There are two main API strands: function and channel-based.
+The recommended API strand is the Function-Based one,
+the Channel-Based one is documented in [examples/legacy](examples/legacy).
 
 Function-Based Consumer
 -----------------------
 
 Messages, errors and events are polled through the `consumer.Poll()` function.
 
-Pros:
-
- * More direct mapping to underlying librdkafka functionality.
-
-Cons:
-
- * Makes it harder to read from multiple channels, but a go-routine easily
-   solves that (see Cons in channel-based consumer below about outdated events).
- * Slower than the channel consumer.
+It has direct mapping to underlying librdkafka functionality.
 
 See [examples/consumer_example](examples/consumer_example)
-
-Channel-Based Consumer (deprecated)
------------------------------------
-
-*Deprecated*: The channel-based consumer is deprecated due to the channel issues
-              mentioned below. Use the function-based consumer.
-
-Messages, errors and events are posted on the `consumer.Events()` channel
-for the application to read.
-
-Pros:
-
- * Possibly more Golang:ish
- * Makes reading from multiple channels easy
- * Fast
-
-Cons:
-
- * Outdated events and messages may be consumed due to the buffering nature
-   of channels. The extent is limited, but not remedied, by the Events channel
-   buffer size (`go.events.channel.size`).
-
-See [examples/consumer_channel_example](examples/consumer_channel_example)
-
-Channel-Based Producer
-----------------------
-
-Application writes messages to the `producer.ProducerChannel()`.
-Delivery reports are emitted on the `producer.Events()` or specified private channel.
-
-Pros:
-
- * Go:ish
- * Proper channel backpressure if librdkafka internal queue is full.
-
-Cons:
-
- * Double queueing: messages are first queued in the channel (size is configurable)
-   and then inside librdkafka.
-
-See [examples/producer_channel_example](examples/producer_channel_example)
 
 Function-Based Producer
 -----------------------
@@ -290,15 +242,10 @@ Function-Based Producer
 Application calls `producer.Produce()` to produce messages.
 Delivery reports are emitted on the `producer.Events()` or specified private channel.
 
-Pros:
-
- * Go:ish
-
-Cons:
+_Warnings_
 
  * `Produce()` is a non-blocking call, if the internal librdkafka queue is full
-   the call will fail.
- * Somewhat slower than the channel producer.
+   the call will fail and can be retried.
 
 See [examples/producer_example](examples/producer_example)
 
@@ -319,3 +266,8 @@ See [kafka/README](kafka/README.md)
 Contributions to the code, examples, documentation, et.al, are very much appreciated.
 
 Make your changes, run `gofmt`, tests, etc, push your branch, create a PR, and [sign the CLA](http://clabot.confluent.io/cla).
+
+Confluent Cloud
+===============
+
+For a step-by-step guide on using the Golang client with Confluent Cloud see [Getting Started with Apache Kafka and Golang](https://developer.confluent.io/get-started/go/) on [Confluent Developer](https://developer.confluent.io/). 

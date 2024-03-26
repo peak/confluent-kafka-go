@@ -1,10 +1,46 @@
 # Confluent's Golang client for Apache Kafka
 
-## v1.7.0
+## v1.9.0
 
-confluent-kafka-go is based on librdkafka v1.7.0, see the
-[librdkafka release notes](https://github.com/edenhill/librdkafka/releases/tag/v1.7.0)
+This is a feature release:
+
+ * OAUTHBEARER OIDC support
+ * KIP-140 Admin API ACL support
+ * Added MockCluster for functional testing of applications without the need
+   for a real Kafka cluster (by @SourceFellows and @kkoehler, #729).
+   See [examples/mock_cluster](examples/mock_cluster).
+
+
+### Fixes
+
+ * Fix Rebalance events behavior for static membership (@jliunyu, #757,
+   #798).
+ * Fix consumer close taking 10 seconds when there's no rebalance
+   needed (@jliunyu, #757).
+
+confluent-kafka-go is based on librdkafka v1.9.0, see the
+[librdkafka release notes](https://github.com/edenhill/librdkafka/releases/tag/v1.9.0)
 for a complete list of changes, enhancements, fixes and upgrade considerations.
+
+
+## v1.8.2
+
+This is a maintenance release:
+
+ * Bundles librdkafka v1.8.2
+ * Check termination channel while reading delivery reports (by @zjj)
+ * Added convenience method Consumer.StoreMessage() (@finncolman, #676)
+
+
+confluent-kafka-go is based on librdkafka v1.8.2, see the
+[librdkafka release notes](https://github.com/edenhill/librdkafka/releases/tag/v1.8.2)
+for a complete list of changes, enhancements, fixes and upgrade considerations.
+
+
+**Note**: There were no confluent-kafka-go v1.8.0 and v1.8.1 releases.
+
+
+## v1.7.0
 
 ### Enhancements
 
@@ -21,6 +57,10 @@ for a complete list of changes, enhancements, fixes and upgrade considerations.
 * AdminClient.CreateTopics() previously did not accept default value(-1) of
   ReplicationFactor without specifying an explicit ReplicaAssignment, this is
   now fixed.
+
+confluent-kafka-go is based on librdkafka v1.7.0, see the
+[librdkafka release notes](https://github.com/edenhill/librdkafka/releases/tag/v1.7.0)
+for a complete list of changes, enhancements, fixes and upgrade considerations.
 
 
 

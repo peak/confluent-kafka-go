@@ -22,37 +22,40 @@ package main
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func main() {
 
 	if len(os.Args) < 4 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <broker> <group> <topics..>\n",
+		fmt.Fprintf(os.Stderr, "Usage: %s <bootstrap-servers> <group> <topics..>\n",
 			os.Args[0])
 		os.Exit(1)
 	}
 
-	broker := os.Args[1]
+	bootstrapServers := os.Args[1]
 	group := os.Args[2]
 	topics := os.Args[3:]
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": broker,
+		"bootstrap.servers": bootstrapServers,
 		// Avoid connecting to IPv6 brokers:
 		// This is needed for the ErrAllBrokersDown show-case below
 		// when using localhost brokers on OSX, since the OSX resolver
 		// will return the IPv6 addresses first.
 		// You typically don't need to specify this configuration property.
-		"broker.address.family": "v4",
-		"group.id":              group,
-		"session.timeout.ms":    6000,
-		"auto.offset.reset":     "earliest"})
+		"broker.address.family":    "v4",
+		"group.id":                 group,
+		"session.timeout.ms":       6000,
+		"auto.offset.reset":        "earliest",
+		"enable.auto.offset.store": false,
+	})
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create consumer: %s\n", err)
@@ -82,6 +85,11 @@ func main() {
 					e.TopicPartition, string(e.Value))
 				if e.Headers != nil {
 					fmt.Printf("%% Headers: %v\n", e.Headers)
+				}
+				_, err := c.StoreMessage(e)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "%% Error storing offset after message %s:\n",
+						e.TopicPartition)
 				}
 			case kafka.Error:
 				// Errors should generally be considered

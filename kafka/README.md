@@ -87,8 +87,7 @@ See instructions in [kafka/librdkafka/README.md](kafka/librdkafka/README.md).
 ### Update librdkafka version requirement
 
 Update the minimum required librdkafka version in `kafka/00version.go`
-and `README.md`.
-
+and `README.md` and the version in `examples/go.mod` and `mk/doc-gen.py`.
 
 ### Update error codes
 
@@ -124,11 +123,6 @@ Run test suite:
 Manually verify that the examples/ applications work.
 
 Also make sure the examples in README.md work.
-
-Convert any examples using `github.com/confluentinc/confluent-kafka-go/kafka` to use
-`gopkg.in/confluentinc/confluent-kafka-go.v1/kafka` import path.
-
-    $ find examples/ -type f -name *\.go -exec sed -i -e 's|github\.com/confluentinc/confluent-kafka-go/kafka|gopkg\.in/confluentinc/confluent-kafka-go\.v1/kafka|g' {} +
 
 ### Commit any changes
 
